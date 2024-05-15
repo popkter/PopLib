@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ColorPickerView">
+        <!-- 背景圆的半径 -->
+        <attr name="circle_radius" format="dimension" />
+        <!-- 可滑动小球的半径 -->
+        <attr name="center_radius" format="dimension" />
+        <!-- 可滑动小球的颜色 -->
+        <attr name="center_color" format="color" />
+        <!-- 圆环还是原型取色盘 -->
+        <attr name="is_ring" format="boolean" />
+        <!-- 圆环的半径 -->
+        <attr name="ring_radius" format="dimension" />
+    </declare-styleable>
+</resources>
