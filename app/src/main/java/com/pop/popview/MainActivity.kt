@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -20,23 +21,28 @@ import com.pop.popview.databinding.PopNotification3Binding
 import com.pop.popview.databinding.PopNotificationBinding
 import com.pop.popview.ui.theme.PopViewTheme
 import com.pop.toolslib.ViewTools
+import com.pop.viewlib.dynamic_dialog.PopViewManager
 import com.pop.viewlib.dynamic_dialog.SpiritViewManager
+import java.util.UUID
 
 @RequiresApi(Build.VERSION_CODES.O)
 class MainActivity : ComponentActivity() {
 
     private val spiritViewManager: SpiritViewManager by lazy { SpiritViewManager(this@MainActivity) }
+    private val popViewManager by lazy { PopViewManager(this) }
 
     private val notificationBinding by lazy {
         PopNotificationBinding.inflate(layoutInflater).apply {
             title.text = "这是一个通知"
             content.text = "这是一个大的通知"
             closeButton.setOnClickListener {
-                spiritViewManager.showView(
-                    notificationBinding3.root,
-                    2000,
-                    OvershootInterpolator(0.5F)
-                )
+                popViewManager.pop(notificationBinding3.root)
+
+                /* spiritViewManager.showView(
+                     notificationBinding3.root,
+                     2000,
+                     OvershootInterpolator(0.5F)
+                 )*/
             }
         }
     }
@@ -54,7 +60,7 @@ class MainActivity : ComponentActivity() {
     private val notificationBinding3 by lazy {
         PopNotification3Binding.inflate(layoutInflater).apply {
             title.text = "这是一个通知"
-            content.text = "这是一个小的通知"
+            content.text = UUID.randomUUID().toString()
             closeButton.setOnClickListener {
                 spiritViewManager.showView(
                     notificationBinding2.root,
@@ -71,21 +77,33 @@ class MainActivity : ComponentActivity() {
 //        spiritViewManager.init()
         ViewTools.instance.checkPopWindowPermission(this@MainActivity) {
             spiritViewManager.init()
+            popViewManager.initComponent()
         }
 
         enableEdgeToEdge()
         setContent {
             PopViewTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    ) {
-                        spiritViewManager.showView(
-                            notificationBinding.root,
-                            2000,
-                            OvershootInterpolator(0.5F)
-                        )
+                    Column {
+                        Greeting(
+                            name = "Android",
+                            modifier = Modifier.padding(innerPadding)
+                        ) {
+                            popViewManager.pop(notificationBinding.root)
+//                            spiritViewManager.show(notificationBinding.root)
+                        }
+
+                        Greeting(
+                            name = "Android",
+                            modifier = Modifier.padding(innerPadding)
+                        ) {
+                            spiritViewManager.showView(
+                                notificationBinding.root,
+                                2000,
+                                OvershootInterpolator(0.5F)
+                            )
+                        }
+
                     }
                 }
             }
