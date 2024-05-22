@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">PopView</string>
     <string name="title">TITLE</string>
+    <string name="doOnAnimatorStart">doOnAnimatorStart</string>
+    <string name="dismissDuration">dismissDuration</string>
+    <string name="doOnDismissEnd">doOnDismissEnd</string>
+    <string name="startAnimatorInterpolator">startAnimatorInterpolator</string>
+    <string name="dismissAnimatorInterpolator">dismissAnimatorInterpolator</string>
+    <string name="hideCoordinateY">hideCoordinateY</string>
+    <string name="showCoordinateY">showCoordinateY</string>
+    <string name="windowLayoutParams">windowLayoutParams</string>
 </resources>
