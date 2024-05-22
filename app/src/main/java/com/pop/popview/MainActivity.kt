@@ -16,12 +16,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.viewbinding.ViewBinding
 import com.pop.popview.databinding.PopNotification2Binding
 import com.pop.popview.databinding.PopNotification3Binding
 import com.pop.popview.databinding.PopNotificationBinding
 import com.pop.popview.ui.theme.PopViewTheme
 import com.pop.toolslib.ViewTools
-import com.pop.viewlib.dynamic_dialog.PopViewManager
+import com.pop.viewlib.dynamic_dialog.QuickFloatViewManager
 import com.pop.viewlib.dynamic_dialog.SpiritViewManager
 import java.util.UUID
 
@@ -29,20 +30,14 @@ import java.util.UUID
 class MainActivity : ComponentActivity() {
 
     private val spiritViewManager: SpiritViewManager by lazy { SpiritViewManager(this@MainActivity) }
-    private val popViewManager by lazy { PopViewManager(this) }
+    private val quickFloatViewManager by lazy { QuickFloatViewManager() }
 
     private val notificationBinding by lazy {
         PopNotificationBinding.inflate(layoutInflater).apply {
             title.text = "这是一个通知"
-            content.text = "这是一个大的通知"
+            content.text = "这是一个小的通知"
             closeButton.setOnClickListener {
-                popViewManager.pop(notificationBinding3.root)
-
-                /* spiritViewManager.showView(
-                     notificationBinding3.root,
-                     2000,
-                     OvershootInterpolator(0.5F)
-                 )*/
+                quickFloatViewManager.pop(notificationBinding3.root)
             }
         }
     }
@@ -52,7 +47,7 @@ class MainActivity : ComponentActivity() {
             title.text = "这是一个通知"
             content.text = "这是一个大的通知"
             closeButton.setOnClickListener {
-                spiritViewManager.dismiss()
+                quickFloatViewManager.dismiss()
             }
         }
     }
@@ -62,11 +57,7 @@ class MainActivity : ComponentActivity() {
             title.text = "这是一个通知"
             content.text = UUID.randomUUID().toString()
             closeButton.setOnClickListener {
-                spiritViewManager.showView(
-                    notificationBinding2.root,
-                    2000,
-                    OvershootInterpolator(0.5F)
-                )
+                quickFloatViewManager.pop(notificationBinding2.root)
             }
         }
     }
@@ -77,7 +68,8 @@ class MainActivity : ComponentActivity() {
 //        spiritViewManager.init()
         ViewTools.instance.checkPopWindowPermission(this@MainActivity) {
             spiritViewManager.init()
-            popViewManager.initComponent()
+//            popViewManager.initComponent()
+            quickFloatViewManager.initComponent(this)
         }
 
         enableEdgeToEdge()
@@ -89,7 +81,7 @@ class MainActivity : ComponentActivity() {
                             name = "Android",
                             modifier = Modifier.padding(innerPadding)
                         ) {
-                            popViewManager.pop(notificationBinding.root)
+                            quickFloatViewManager.pop(notificationBinding.root)
 //                            spiritViewManager.show(notificationBinding.root)
                         }
 

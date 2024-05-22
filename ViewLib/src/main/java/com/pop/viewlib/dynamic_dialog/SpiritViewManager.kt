@@ -41,6 +41,7 @@ import kotlin.math.sqrt
  * [context] Context For get WindowManager & create rootView
  */
 
+@Deprecated("instead of [QuickFloatViewManager] ")
 @SuppressLint("ClickableViewAccessibility")
 @RequiresApi(Build.VERSION_CODES.O)
 class SpiritViewManager(private val context: Context) : View.OnTouchListener,
