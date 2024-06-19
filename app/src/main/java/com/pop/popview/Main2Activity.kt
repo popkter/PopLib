@@ -22,10 +22,27 @@ class Main2Activity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(binding.root)
         binding.seekbar.apply {
-            max = 8
+            max = 100
             onProgressChangeListener = {
                 Log.e(TAG, "onCreate: $it")
             }
+        }
+
+
+
+        binding.enable.setOnClickListener {
+            binding.seekbar.isEnabled = true
+            binding.seekbar.setProgress(100, true, true)
+        }
+
+        binding.disable.setOnClickListener {
+            binding.seekbar.isEnabled = false
+            binding.seekbar.setProgress(0, true, true)
+        }
+
+        binding.seekbar.onProgressChangeListener = {
+            Log.e(TAG, "onProgressChangeListener: $it")
+            binding.muteIv.isSelected = it > 0
         }
 
     }

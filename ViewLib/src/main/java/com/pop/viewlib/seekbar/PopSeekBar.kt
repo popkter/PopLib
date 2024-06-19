@@ -8,6 +8,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -215,10 +216,15 @@ class PopSeekBar : View {
 
             MotionEvent.ACTION_MOVE -> {
                 if (progressValue > max || progressValue < 0) {
-                    val widthAddition = (if (progressValue < 0) abs(progressValue - 100) else progressValue) / 8
+                    val widthAddition =
+                       ( (if (progressValue < 0) (0 - progressValue) / max.toFloat() * 1000 else (progressValue - max) / max.toFloat() * 1000) / 8).toInt()
+
+                    Log.e(TAG, "onTouchEvent: widthAddition= $widthAddition")
+
                     layoutParams.width = widthAddition + originWidth
-                    layoutParams.height = ( (originWidth * originHeight) / (widthAddition + originWidth))
+                    layoutParams.height = ((originWidth * originHeight) / (widthAddition + originWidth))
                     requestLayout()
+
                 } else {
                     if (layoutParams.width > originWidth){
                         val widthAddition = progressValue / 8
@@ -250,6 +256,10 @@ class PopSeekBar : View {
         return true
     }
 
+    private fun restoreSize(){
+
+    }
+
     /**
      * update Progress value
      * [notifyListener] whether notify listener
@@ -276,6 +286,9 @@ class PopSeekBar : View {
             } else {
                 this.progress = aimProgress
                 invalidate()
+                if (notifyListener) {
+                    onProgressChangeListener?.invoke(this.progress)
+                }
             }
         }
     }

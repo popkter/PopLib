@@ -10,26 +10,40 @@
     <com.pop.viewlib.seekbar.PopSeekBar
         android:id="@+id/seekbar"
         android:layout_width="500dp"
-        android:layout_height="200dp"
-        android:padding="20dp"
+        android:layout_height="150dp"
         android:layout_marginTop="100dp"
         app:progressSolidColor="@color/black"
-        app:trackSolidColor="@color/design_default_color_surface"
+        app:trackSolidColor="#FF5722"
         app:commonRadius="30dp"
+        app:naturalProcess="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.pop.viewlib.seekbar.PopSeekBar
-        android:layout_width="500dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="400dp"
-        app:progressSolidColor="@color/black"
-        app:trackSolidColor="@color/design_default_color_surface"
-        app:commonRadius="20dp"
-        app:naturalProcess="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <ImageView
+        android:id="@+id/muteIv"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/icon_navigation_media_selector"
+        app:layout_constraintBottom_toBottomOf="@id/seekbar"
+        app:layout_constraintStart_toStartOf="@id/seekbar"
+        app:layout_constraintTop_toTopOf="@id/seekbar" />
+
+    <Button
+        android:id="@+id/disable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="mute"
+        app:layout_constraintStart_toStartOf="@id/seekbar"
+        app:layout_constraintTop_toBottomOf="@id/seekbar" />
+
+    <Button
+        android:id="@+id/enable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="un mute"
+        app:layout_constraintStart_toStartOf="@id/seekbar"
+        app:layout_constraintTop_toBottomOf="@id/disable" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
