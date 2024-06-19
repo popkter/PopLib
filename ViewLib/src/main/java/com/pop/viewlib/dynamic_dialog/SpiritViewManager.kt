@@ -40,7 +40,7 @@ import kotlin.math.sqrt
  * Dynamic Island Manager
  * [context] Context For get WindowManager & create rootView
  */
-
+@Deprecated("instead of [QuickFloatViewManager] ")
 @SuppressLint("ClickableViewAccessibility")
 @RequiresApi(Build.VERSION_CODES.O)
 class SpiritViewManager(private val context: Context) : View.OnTouchListener,

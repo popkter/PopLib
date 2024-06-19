@@ -12,4 +12,52 @@
         <!-- 圆环的半径 -->
         <attr name="ring_radius" format="dimension" />
     </declare-styleable>
+
+
+    <declare-styleable name="PopSeekBar">
+        <attr name="progressSolidColor" format="color"/>
+        <attr name="progressStartSolidColor" format="color"/>
+        <attr name="progressEndSolidColor" format="color"/>
+        <attr name="progressRadius" format="dimension"/>
+
+        <attr name="trackSolidColor" format="color"/>
+        <attr name="trackStartSolidColor" format="color"/>
+        <attr name="trackEndSolidColor" format="color"/>
+        <attr name="trackRadius" format="dimension"/>
+
+        <attr name="naturalProcess" format="boolean"/>
+
+        <attr name="commonRadius" format="dimension"/>
+
+        <attr name="progressGradientType" format="integer">
+            <enum name="Linear" value="0" />
+            <enum name="Radial" value="1" />
+        </attr>
+
+        <attr name="progressGradientAngle" format="integer">
+            <enum name="left2right" value="0" />
+            <enum name="right2left" value="180" />
+            <enum name="top2bottom" value="90" />
+            <enum name="bottom2top" value="270" />
+            <enum name="leftTop2rightBottom" value="45" />
+            <enum name="rightTop2leftBottom" value="135" />
+            <enum name="leftBottom2rightTop" value="225" />
+            <enum name="rightBottom2leftTop" value="315" />
+        </attr>
+
+        <attr name="trackGradientType" format="integer">
+            <enum name="Linear" value="0" />
+            <enum name="Radial" value="1" />
+        </attr>
+        <attr name="trackGradientAngle" format="integer">
+            <enum name="left2right" value="0" />
+            <enum name="right2left" value="180" />
+            <enum name="top2bottom" value="90" />
+            <enum name="bottom2top" value="270" />
+            <enum name="leftTop2rightBottom" value="45" />
+            <enum name="rightTop2leftBottom" value="135" />
+            <enum name="leftBottom2rightTop" value="225" />
+            <enum name="rightBottom2leftTop" value="315" />
+        </attr>
+    </declare-styleable>
 </resources>
