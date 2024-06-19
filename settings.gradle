@@ -19,7 +19,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "PopView"
+rootProject.name = "PopLib"
 include ':app'
 include ':ViewLib'
 include ':ToolsLib'
