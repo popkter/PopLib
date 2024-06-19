@@ -13,9 +13,11 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.OvershootInterpolator
-import com.pop.demopanel.view.drawProgressPath
+import com.pop.demopanel.view.drawHorizontalProgressPath
 import com.pop.demopanel.view.drawProgressPathNatural
 import com.pop.demopanel.view.drawTrackPath
+import com.pop.demopanel.view.drawVerticalProgressPath
+import com.pop.demopanel.view.drawVerticalProgressPathNatural
 import com.pop.demopanel.view.setGradientShader
 import com.pop.viewlib.R
 import kotlin.math.abs
@@ -52,6 +54,8 @@ class PopSeekBar : View {
     private var commonRadius = 0F
     private var originWidth = 0
     private var originHeight = 0
+
+    private var isHorizontal = true
 
     private var isInit = true
 
@@ -123,6 +127,8 @@ class PopSeekBar : View {
 
         naturalProcess = typeArray.getBoolean(R.styleable.PopSeekBar_naturalProcess, false)
 
+        isHorizontal = typeArray.getInt(R.styleable.PopSeekBar_orientation, 0) == 0
+
         trackPath = Path()
         trackPaint = Paint().apply {
             style = Paint.Style.FILL
@@ -149,13 +155,13 @@ class PopSeekBar : View {
             originWidth = width
             originHeight = height
         }
-        trackPath.drawTrackPath(0F + paddingStart, 0F + paddingTop, width.toFloat() - paddingEnd, height.toFloat() - paddingBottom, if (trackRadius == 0F) commonRadius else trackRadius)
+        trackPath.drawTrackPath(0F, 0F, width.toFloat(), height.toFloat(), if (trackRadius == 0F) commonRadius else trackRadius)
         if (trackColors.any { it != 0 }) {
             trackPaint.setGradientShader(
-                0F + paddingStart,
-                0F + paddingTop,
-                width.toFloat() - paddingEnd,
-                height.toFloat() - paddingBottom,
+                0F,
+                0F,
+                width.toFloat(),
+                height.toFloat(),
                 trackColors,
                 trackGradientType,
                 trackGradientAngle
@@ -166,34 +172,59 @@ class PopSeekBar : View {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawPath(trackPath, trackPaint)
-        val progressWidth = width * (progress.toFloat() / max)
-        if (!naturalProcess) {
-            progressPath.drawProgressPath(
-                0F + paddingStart,
-                0F + paddingTop,
-                width.toFloat() - paddingEnd,
-                height.toFloat() - paddingBottom,
-                if (progressRadius == 0F) commonRadius else progressRadius,
-                0F + paddingStart + progressWidth
-            )
+
+        if (isHorizontal) {
+            val progressWidth = width * (progress.toFloat() / max)
+            if (!naturalProcess) {
+                progressPath.drawProgressPathNatural(
+                    0F,
+                    0F,
+                    width.toFloat(),
+                    height.toFloat(),
+                    if (progressRadius == 0F) commonRadius else progressRadius,
+                    0F + progressWidth
+                )
+            } else {
+                progressPath.drawHorizontalProgressPath(
+                    0F,
+                    0F,
+                    width.toFloat(),
+                    height.toFloat(),
+                    if (progressRadius == 0F) commonRadius else progressRadius,
+                    0F + progressWidth
+                )
+            }
         } else {
-            progressPath.drawProgressPathNatural(
-                0F + paddingStart,
-                0F + paddingTop,
-                width.toFloat() - paddingEnd,
-                height.toFloat() - paddingBottom,
-                if (progressRadius == 0F) commonRadius else progressRadius,
-                0F + paddingStart + progressWidth
-            )
+            val progressHeight = height * (progress.toFloat() / max)
+            if (naturalProcess) {
+                progressPath.drawVerticalProgressPathNatural(
+                    0F,
+                    0F,
+                    width.toFloat(),
+                    height.toFloat(),
+                    if (progressRadius == 0F) commonRadius else progressRadius,
+                    progressHeight
+                )
+            } else {
+                progressPath.drawVerticalProgressPath(
+                    0F,
+                    0F,
+                    width.toFloat(),
+                    height.toFloat(),
+                    if (progressRadius == 0F) commonRadius else progressRadius,
+                    progressHeight
+                )
+            }
         }
+
         finalPath.reset()
         finalPath.op(progressPath, trackPath, Path.Op.INTERSECT)
         if (progressColors.any { it != 0 }) {
             progressPaint.setGradientShader(
-                0F + paddingStart,
-                0F + paddingTop,
-                progressWidth - paddingEnd,
-                height.toFloat() - paddingBottom,
+                0F,
+                0F,
+                width.toFloat(),
+                height.toFloat(),
                 progressColors,
                 progressGradientType,
                 progressGradientAngle
@@ -205,51 +236,71 @@ class PopSeekBar : View {
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (!this.isEnabled) return false
-        val x = event.x
-        val progressValue = ((x / width) * max).toInt()
-        when (event.action) {
-            MotionEvent.ACTION_DOWN -> {
-                if (canResponseTouch){
-                    setProgress(progressValue,notifyListener = false,animator = true)
-                }
-            }
-
-            MotionEvent.ACTION_MOVE -> {
-                if (progressValue > max || progressValue < 0) {
-                    val widthAddition =
-                       ( (if (progressValue < 0) (0 - progressValue) / max.toFloat() * 1000 else (progressValue - max) / max.toFloat() * 1000) / 8).toInt()
-
-                    Log.e(TAG, "onTouchEvent: widthAddition= $widthAddition")
-
-                    layoutParams.width = widthAddition + originWidth
-                    layoutParams.height = ((originWidth * originHeight) / (widthAddition + originWidth))
-                    requestLayout()
-
-                } else {
-                    if (layoutParams.width > originWidth){
-                        val widthAddition = progressValue / 8
-                        layoutParams.width = width - widthAddition
-                        layoutParams.height = ( (originWidth * originHeight) / (width - widthAddition))
-                        requestLayout()
+        if (isHorizontal) {
+            val x = event.x
+            val progressValue = ((x / width) * max).toInt()
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    if (canResponseTouch) {
+                        setProgress(progressValue, notifyListener = false, animator = true)
                     }
                 }
-                setProgress(max(min(max, progressValue), 0), true)
-            }
 
-            MotionEvent.ACTION_UP -> {
-                if (layoutParams.width >= originWidth){
-                    val widthHolder = PropertyValuesHolder.ofInt("width",width, originWidth)
-                    val heightHolder = PropertyValuesHolder.ofInt("height",height, originHeight)
-                    ValueAnimator.ofPropertyValuesHolder(widthHolder, heightHolder).apply {
-                        interpolator = OvershootInterpolator()
-                        addUpdateListener {
-                            layoutParams.width = it.getAnimatedValue("width") as Int
-                            layoutParams.height = it.getAnimatedValue("height") as Int
+                MotionEvent.ACTION_MOVE -> {
+                    if (progressValue > max || progressValue < 0) {
+                        val widthAddition =
+                            ((if (progressValue < 0) (0 - progressValue) / max.toFloat() * 1000 else (progressValue - max) / max.toFloat() * 1000) / 8).toInt()
+
+                        layoutParams.width = widthAddition + originWidth
+                        layoutParams.height =
+                            ((originWidth * originHeight) / (widthAddition + originWidth))
+                        requestLayout()
+
+                    } else {
+                        if (layoutParams.width > originWidth) {
+                            val widthAddition = progressValue / 8
+                            layoutParams.width = width - widthAddition
+                            layoutParams.height =
+                                ((originWidth * originHeight) / (width - widthAddition))
                             requestLayout()
                         }
-                    }.start()
+                    }
+                    setProgress(max(min(max, progressValue), 0), true)
                 }
+
+                MotionEvent.ACTION_UP -> {
+                    if (layoutParams.width >= originWidth) {
+                        val widthHolder = PropertyValuesHolder.ofInt("width", width, originWidth)
+                        val heightHolder =
+                            PropertyValuesHolder.ofInt("height", height, originHeight)
+                        ValueAnimator.ofPropertyValuesHolder(widthHolder, heightHolder).apply {
+                            interpolator = OvershootInterpolator()
+                            addUpdateListener {
+                                layoutParams.width = it.getAnimatedValue("width") as Int
+                                layoutParams.height = it.getAnimatedValue("height") as Int
+                                requestLayout()
+                            }
+                        }.start()
+                    }
 //                onProgressChangeListener?.invoke(progress)
+                }
+            }
+        } else {
+            val y = event.y
+            val progressValue = ((1 - y / height) * max).toInt()
+            Log.e(TAG, "onTouchEvent vertical:paddingTop= $paddingTop originHeight= $originHeight y= $y progressValue= $progressValue", )
+            when(event.action){
+                MotionEvent.ACTION_DOWN -> {
+                    setProgress(progressValue, true, true)
+                }
+
+                MotionEvent.ACTION_MOVE -> {
+
+                }
+
+                MotionEvent.ACTION_UP -> {
+
+                }
             }
         }
         invalidate()

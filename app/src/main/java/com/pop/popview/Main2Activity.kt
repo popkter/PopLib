@@ -21,11 +21,9 @@ class Main2Activity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
+        supportActionBar?.hide()
         binding.seekbar.apply {
             max = 100
-            onProgressChangeListener = {
-                Log.e(TAG, "onCreate: $it")
-            }
         }
 
 
@@ -41,8 +39,12 @@ class Main2Activity : AppCompatActivity() {
         }
 
         binding.seekbar.onProgressChangeListener = {
-            Log.e(TAG, "onProgressChangeListener: $it")
             binding.muteIv.isSelected = it > 0
+            binding.progressTv.text = it.toString()
+        }
+
+        binding.seekbar1.onProgressChangeListener = {
+            binding.progressTv1.text = it.toString()
         }
 
     }

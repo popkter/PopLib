@@ -29,6 +29,11 @@
 
         <attr name="commonRadius" format="dimension"/>
 
+        <attr name="orientation" format="integer">
+            <enum name="horizontal" value="0"/>
+            <enum name="vertical" value="1"/>
+        </attr>
+
         <attr name="progressGradientType" format="integer">
             <enum name="Linear" value="0" />
             <enum name="Radial" value="1" />
