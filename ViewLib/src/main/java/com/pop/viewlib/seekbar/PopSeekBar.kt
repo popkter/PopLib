@@ -258,12 +258,17 @@ class PopSeekBar : View {
     fun setProgress(progress: Int, notifyListener: Boolean, animator: Boolean = false) {
         val aimProgress = max(0, min(max, progress))
         val curProgress = this.progress
-        if (aimProgress != curProgress){
+        if (aimProgress != curProgress) {
             if (animator) {
                 ValueAnimator.ofInt(curProgress, aimProgress).apply {
                     interpolator = AccelerateDecelerateInterpolator()
-                    addUpdateListener {
-                        this@PopSeekBar.progress = it.animatedValue as Int
+                    addUpdateListener { animation ->
+                        (animation.animatedValue as Int).let {
+                            this@PopSeekBar.progress = it
+                            if (notifyListener) {
+                                onProgressChangeListener?.invoke(it)
+                            }
+                        }
                         invalidate()
                     }
                     duration = abs(aimProgress - curProgress) * 5L
@@ -272,9 +277,6 @@ class PopSeekBar : View {
                 this.progress = aimProgress
                 invalidate()
             }
-        }
-        if (notifyListener) {
-            onProgressChangeListener?.invoke(this.progress)
         }
     }
     
