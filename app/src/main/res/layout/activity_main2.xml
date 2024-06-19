@@ -8,6 +8,7 @@
     tools:context=".Main2Activity">
 
     <com.pop.viewlib.seekbar.PopSeekBar
+        android:id="@+id/seekbar"
         android:layout_width="500dp"
         android:layout_height="200dp"
         android:padding="20dp"
@@ -15,7 +16,6 @@
         app:progressSolidColor="@color/black"
         app:trackSolidColor="@color/design_default_color_surface"
         app:commonRadius="30dp"
-        app:naturalProcess="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

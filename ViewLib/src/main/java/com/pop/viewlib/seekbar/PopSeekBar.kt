@@ -30,7 +30,6 @@ class PopSeekBar : View {
         const val TAG = "PopSeekBar"
     }
 
-    private val max = 100
     private var progress = 0
 
     private lateinit var trackPaint: Paint
@@ -70,6 +69,11 @@ class PopSeekBar : View {
      * not suggest to modify it
      */
     var canResponseTouch = false
+
+    /**
+     * max value of progress
+     */
+    var max = 100
 
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
         initView(attrs)
@@ -239,7 +243,7 @@ class PopSeekBar : View {
                         }
                     }.start()
                 }
-                onProgressChangeListener?.invoke(progressValue)
+//                onProgressChangeListener?.invoke(progress)
             }
         }
         invalidate()
