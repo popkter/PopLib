@@ -199,6 +199,7 @@ class PopSeekBar : View {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (!this.isEnabled) return false
         val x = event.x
         val progressValue = ((x / width) * max).toInt()
         when (event.action) {
