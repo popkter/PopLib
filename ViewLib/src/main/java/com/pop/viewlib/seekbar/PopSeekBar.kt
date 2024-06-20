@@ -143,7 +143,7 @@ class PopSeekBar : View {
 
         commonRadius = typeArray.getDimension(R.styleable.PopSeekBar_commonRadius, 0F)
 
-        naturalProcess = typeArray.getBoolean(R.styleable.PopSeekBar_naturalProcess, false)
+        naturalProcess = typeArray.getBoolean(R.styleable.PopSeekBar_naturalProcess, true)
 
         isHorizontal = typeArray.getInt(R.styleable.PopSeekBar_orientation, 0) == 0
 
@@ -202,7 +202,7 @@ class PopSeekBar : View {
 
         if (isHorizontal) {
             val progressWidth = width * (progress.toFloat() / max)
-            if (!naturalProcess) {
+            if (naturalProcess) {
                 progressPath.drawHorizontalProgressPathNatural(
                     0F,
                     0F,
