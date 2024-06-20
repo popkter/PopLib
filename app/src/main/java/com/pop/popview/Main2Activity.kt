@@ -23,7 +23,7 @@ class Main2Activity : AppCompatActivity() {
         setContentView(binding.root)
         supportActionBar?.hide()
         binding.seekbar.apply {
-            max = 100
+            max = 50
         }
 
 
@@ -38,13 +38,16 @@ class Main2Activity : AppCompatActivity() {
             binding.seekbar.setProgress(0, true, true)
         }
 
-        binding.seekbar.onProgressChangeListener = {
-            binding.muteIv.isSelected = it > 0
-            binding.progressTv.text = it.toString()
+        binding.seekbar.onProgressChangeListener = { progress, isFinal ->
+            binding.muteIv.isSelected = progress > 0
+            binding.progressTv.text = progress.toString()
+            if (isFinal){
+                Log.e(TAG, "onCreate: final progress= $progress")
+            }
         }
 
-        binding.seekbar1.onProgressChangeListener = {
-            binding.progressTv1.text = it.toString()
+        binding.seekbar1.onProgressChangeListener = { progress, isFinal ->
+            binding.progressTv1.text = progress.toString()
         }
 
     }

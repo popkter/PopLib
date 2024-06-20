@@ -4,6 +4,7 @@ import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Shader
+import android.os.Build.VERSION_CODES.P
 import android.util.Log
 
 fun Paint.setGradientShader(
@@ -87,7 +88,7 @@ fun Path.drawTrackPath(left: Float, top: Float, right: Float, bottom: Float, rad
     close()
 }
 
-fun Path.drawProgressPathNatural(left: Float, top: Float, right: Float, bottom: Float, radius: Float,progress: Float) {
+fun Path.drawHorizontalProgressPathNatural(left: Float, top: Float, right: Float, bottom: Float, radius: Float,progress: Float) {
     reset()
     moveTo(left, top)
     when (progress) {
@@ -126,47 +127,41 @@ fun Path.drawProgressPathNatural(left: Float, top: Float, right: Float, bottom: 
 
 fun Path.drawVerticalProgressPathNatural(left: Float, top: Float, right: Float, bottom: Float, radius: Float, progress: Float) {
     reset()
-
     moveTo(left, bottom)
 
     when (progress) {
-        in bottom + radius..bottom - radius * 2 -> {
-            lineTo(left, bottom + radius)
-//            quadTo(progress, top, progress, top + progress - left - radius)
-            quadTo(left, progress, left + progress - radius, progress)
-            lineTo(right - progress + radius, progress)
-//            quadTo(progress, bottom, progress - (progress - left - radius), bottom)
-            quadTo(right, progress, right,bottom + radius)
+
+        in radius..2 * radius -> {
+            lineTo(left, bottom - radius)
+            quadTo(left, bottom - progress, left + progress - radius, bottom - progress)
+            lineTo(right - progress + radius, bottom - progress)
+            quadTo(right, bottom - progress, right, bottom - radius)
         }
 
-        in bottom - radius * 2..top - 2 * radius -> {
-            lineTo(progress - radius, top)
-            arcTo(progress - radius * 2, top, progress, top + radius * 2, 270F, 90F, false)
-            lineTo(progress, bottom - radius)
-            arcTo(progress - radius * 2, bottom - radius * 2, progress, bottom, 0F, 90F, false)
+        in radius * 2..bottom - radius * 2 -> {
+            lineTo(left, bottom - progress + radius)
+            arcTo(left, bottom - progress, left + radius * 2, bottom - progress + radius * 2, 180F, 90F, false)
+            lineTo(right - radius, bottom - progress)
+            arcTo(right - radius * 2, bottom - progress, right, bottom - progress + radius * 2, 270F, 90F, false)
         }
 
-        in top - 2 * radius..top - radius -> {
-            val r = right - progress - radius
-            lineTo(progress - r,top)
-            quadTo(progress,top,progress,top + r)
-            lineTo(progress,bottom - r)
-            quadTo(progress,bottom,progress - r,bottom)
+        in bottom - radius * 2..bottom - radius -> {
+            val r = bottom - progress - radius
+            lineTo(left, bottom - progress + r)
+            quadTo(left, bottom - progress, left + r, bottom - progress)
+            lineTo(right - r, bottom - progress)
+            quadTo(right, bottom - progress, right, bottom - progress + r)
         }
 
         else -> {
-            lineTo(progress, top)
-            lineTo(progress, bottom)
+            lineTo(left, bottom - progress)
+            lineTo(right, bottom - progress)
         }
 
     }
     lineTo(right, bottom)
-
     lineTo(left, bottom)
-
     close()
-
-
 }
 
 

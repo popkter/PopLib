@@ -14,7 +14,7 @@ import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import com.pop.demopanel.view.drawHorizontalProgressPath
-import com.pop.demopanel.view.drawProgressPathNatural
+import com.pop.demopanel.view.drawHorizontalProgressPathNatural
 import com.pop.demopanel.view.drawTrackPath
 import com.pop.demopanel.view.drawVerticalProgressPath
 import com.pop.demopanel.view.drawVerticalProgressPathNatural
@@ -34,6 +34,7 @@ class PopSeekBar : View {
     }
 
     private var progress = 0
+    private var finalValue = 0
 
     private lateinit var trackPaint: Paint
     private lateinit var trackColors: IntArray
@@ -67,7 +68,7 @@ class PopSeekBar : View {
     /**
      * progress change listener
      */
-    var onProgressChangeListener: ((Int) -> Unit)? = null
+    var onProgressChangeListener: ((progress: Int, isFinal: Boolean) -> Unit)? = null
 
     /**
      * whether can response touch down event
@@ -148,6 +149,13 @@ class PopSeekBar : View {
         typeArray.recycle()
     }
 
+    private fun notifyFinalProgress() {
+        if (finalValue != progress) {
+            finalValue = progress
+            onProgressChangeListener?.invoke(progress, true)
+        }
+    }
+
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         super.onLayout(changed, l, t, r, b)
         if (isInit) {
@@ -176,7 +184,7 @@ class PopSeekBar : View {
         if (isHorizontal) {
             val progressWidth = width * (progress.toFloat() / max)
             if (!naturalProcess) {
-                progressPath.drawProgressPathNatural(
+                progressPath.drawHorizontalProgressPathNatural(
                     0F,
                     0F,
                     width.toFloat(),
@@ -248,22 +256,15 @@ class PopSeekBar : View {
 
                 MotionEvent.ACTION_MOVE -> {
                     if (progressValue > max || progressValue < 0) {
-                        val widthAddition =
-                            ((if (progressValue < 0) (0 - progressValue) / max.toFloat() * 1000 else (progressValue - max) / max.toFloat() * 1000) / 8).toInt()
-
+                        val widthAddition =  (abs(progressValue % max) / max.toFloat() * 125).toInt()
+                        if (widthAddition > 50) {
+                            return false
+                        }
                         layoutParams.width = widthAddition + originWidth
                         layoutParams.height =
                             ((originWidth * originHeight) / (widthAddition + originWidth))
                         requestLayout()
 
-                    } else {
-                        if (layoutParams.width > originWidth) {
-                            val widthAddition = progressValue / 8
-                            layoutParams.width = width - widthAddition
-                            layoutParams.height =
-                                ((originWidth * originHeight) / (width - widthAddition))
-                            requestLayout()
-                        }
                     }
                     setProgress(max(min(max, progressValue), 0), true)
                 }
@@ -282,33 +283,51 @@ class PopSeekBar : View {
                             }
                         }.start()
                     }
-//                onProgressChangeListener?.invoke(progress)
+                    notifyFinalProgress()
                 }
             }
         } else {
             val y = event.y
             val progressValue = ((1 - y / height) * max).toInt()
-            Log.e(TAG, "onTouchEvent vertical:paddingTop= $paddingTop originHeight= $originHeight y= $y progressValue= $progressValue", )
             when(event.action){
                 MotionEvent.ACTION_DOWN -> {
-                    setProgress(progressValue, true, true)
+                    if (canResponseTouch) {
+                        setProgress(progressValue, true, true)
+                    }
                 }
 
                 MotionEvent.ACTION_MOVE -> {
-
+                    if (progressValue > max || progressValue < 0) {
+                        val heightAddition =   (abs(progressValue % max) / max.toFloat() * 125).toInt()
+                        if (heightAddition > 50) {
+                            return false
+                        }
+                        layoutParams.height = heightAddition + originHeight
+                        layoutParams.width = ((originWidth * originHeight) / (heightAddition + originHeight))
+                        requestLayout()
+                    }
+                    setProgress(max(min(max, progressValue), 0), true)
                 }
 
                 MotionEvent.ACTION_UP -> {
-
+                    if (layoutParams.height >= originHeight) {
+                        val widthHolder = PropertyValuesHolder.ofInt("width", width, originWidth)
+                        val heightHolder = PropertyValuesHolder.ofInt("height", height, originHeight)
+                        ValueAnimator.ofPropertyValuesHolder(widthHolder, heightHolder).apply {
+                            interpolator = OvershootInterpolator()
+                            addUpdateListener {
+                                layoutParams.width = it.getAnimatedValue("width") as Int
+                                layoutParams.height = it.getAnimatedValue("height") as Int
+                                requestLayout()
+                            }
+                        }.start()
+                    }
+                    notifyFinalProgress()
                 }
             }
         }
         invalidate()
         return true
-    }
-
-    private fun restoreSize(){
-
     }
 
     /**
@@ -327,7 +346,7 @@ class PopSeekBar : View {
                         (animation.animatedValue as Int).let {
                             this@PopSeekBar.progress = it
                             if (notifyListener) {
-                                onProgressChangeListener?.invoke(it)
+                                onProgressChangeListener?.invoke(it, false)
                             }
                         }
                         invalidate()
@@ -338,7 +357,7 @@ class PopSeekBar : View {
                 this.progress = aimProgress
                 invalidate()
                 if (notifyListener) {
-                    onProgressChangeListener?.invoke(this.progress)
+                    onProgressChangeListener?.invoke(this.progress, false)
                 }
             }
         }
