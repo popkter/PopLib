@@ -76,21 +76,5 @@
         app:layout_constraintStart_toStartOf="@id/seekbar"
         app:layout_constraintEnd_toEndOf="@id/seekbar" />
 
-    <Button
-        android:id="@+id/disable"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="mute"
-        app:layout_constraintStart_toStartOf="@id/seekbar"
-        app:layout_constraintTop_toBottomOf="@id/seekbar" />
-
-    <Button
-        android:id="@+id/enable"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="un mute"
-        app:layout_constraintStart_toStartOf="@id/seekbar"
-        app:layout_constraintTop_toBottomOf="@id/disable" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

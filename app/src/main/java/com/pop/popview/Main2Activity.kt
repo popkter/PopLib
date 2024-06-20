@@ -24,18 +24,13 @@ class Main2Activity : AppCompatActivity() {
         supportActionBar?.hide()
         binding.seekbar.apply {
             max = 50
+            stretchStep = 150
+            maxStretchDistance =70
+//            canResponseTouch = true
         }
 
-
-
-        binding.enable.setOnClickListener {
-            binding.seekbar.isEnabled = true
-            binding.seekbar.setProgress(100, true, true)
-        }
-
-        binding.disable.setOnClickListener {
-            binding.seekbar.isEnabled = false
-            binding.seekbar.setProgress(0, true, true)
+        binding.seekbar1.apply {
+//            canResponseTouch = true
         }
 
         binding.seekbar.onProgressChangeListener = { progress, isFinal ->

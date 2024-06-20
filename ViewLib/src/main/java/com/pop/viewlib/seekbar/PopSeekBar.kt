@@ -7,6 +7,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.PointF
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -21,6 +22,7 @@ import com.pop.demopanel.view.drawVerticalProgressPathNatural
 import com.pop.demopanel.view.setGradientShader
 import com.pop.viewlib.R
 import kotlin.math.abs
+import kotlin.math.acos
 import kotlin.math.max
 import kotlin.math.min
 
@@ -60,6 +62,10 @@ class PopSeekBar : View {
 
     private var isInit = true
 
+    private val touchDownPoint = PointF(0F, 0F)
+
+    private var touchDownProgress = 0
+
     /**
      * whether use natural process modifier
      */
@@ -80,6 +86,16 @@ class PopSeekBar : View {
      * max value of progress
      */
     var max = 100
+
+    /**
+     * deformation dimension per unit stretch of the view
+     */
+    var stretchStep = 125
+
+    /**
+     * maximum distance to stretch the view
+     */
+    var maxStretchDistance = 50
 
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
         initView(attrs)
@@ -243,23 +259,38 @@ class PopSeekBar : View {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
+
+        val action = when(event.action){
+            MotionEvent.ACTION_DOWN -> "ACTION_DOWN"
+            MotionEvent.ACTION_MOVE -> "ACTION_MOVE"
+            MotionEvent.ACTION_UP -> "ACTION_UP"
+            else -> "UNKNOWN"
+        }
+//        Log.e(TAG, "onTouchEvent: action= $action x= ${event.x}")
         if (!this.isEnabled) return false
         if (isHorizontal) {
             val x = event.x
-            val progressValue = ((x / width) * max).toInt()
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    if (canResponseTouch) {
+                    touchDownProgress = if (canResponseTouch) {
+                        val progressValue = ((x / width) * max).toInt()
                         setProgress(progressValue, notifyListener = false, animator = true)
+                        progressValue
+                    }else{
+                        progress
                     }
+                    touchDownPoint.set(event.x, event.y)
                 }
 
                 MotionEvent.ACTION_MOVE -> {
+                    val progressDiffValue = ((event.x - touchDownPoint.x) / width * max).toInt()
+                    val progressValue = touchDownProgress + progressDiffValue
+                    Log.e(TAG, "onTouchEvent: layoutParams.width= ${layoutParams.width} progressDiffValue= $progressDiffValue progressValue= $progressValue",)
+
                     if (progressValue > max || progressValue < 0) {
-                        val widthAddition =  (abs(progressValue % max) / max.toFloat() * 125).toInt()
-                        if (widthAddition > 50) {
-                            return false
-                        }
+                        val widthAddition = min(maxStretchDistance, ((if (progressValue > max) progressValue - max else abs(progressValue)) / max.toFloat() * stretchStep).toInt())
+
+                        if (widthAddition > maxStretchDistance) return true
                         layoutParams.width = widthAddition + originWidth
                         layoutParams.height =
                             ((originWidth * originHeight) / (widthAddition + originWidth))
@@ -288,20 +319,25 @@ class PopSeekBar : View {
             }
         } else {
             val y = event.y
-            val progressValue = ((1 - y / height) * max).toInt()
             when(event.action){
                 MotionEvent.ACTION_DOWN -> {
-                    if (canResponseTouch) {
-                        setProgress(progressValue, true, true)
+                    touchDownProgress = if (canResponseTouch) {
+                        val progressValue = ((1 - y / height) * max).toInt()
+                        setProgress(progressValue, notifyListener = false, animator = true)
+                        progressValue
+                    }else{
+                        progress
                     }
+                    touchDownPoint.set(event.x, event.y)
                 }
 
                 MotionEvent.ACTION_MOVE -> {
+                    val progressDiffValue = ((touchDownPoint.y - event.y ) / height * max).toInt()
+                    val progressValue = touchDownProgress + progressDiffValue
+
                     if (progressValue > max || progressValue < 0) {
-                        val heightAddition =   (abs(progressValue % max) / max.toFloat() * 125).toInt()
-                        if (heightAddition > 50) {
-                            return false
-                        }
+                        val heightAddition = min(maxStretchDistance,  ((if (progressValue > max) progressValue - max else abs(progressValue)) / max.toFloat() * stretchStep).toInt())
+
                         layoutParams.height = heightAddition + originHeight
                         layoutParams.width = ((originWidth * originHeight) / (heightAddition + originHeight))
                         requestLayout()
