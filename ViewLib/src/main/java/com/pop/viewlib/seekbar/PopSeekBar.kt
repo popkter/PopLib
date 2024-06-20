@@ -22,7 +22,6 @@ import com.pop.demopanel.view.drawVerticalProgressPathNatural
 import com.pop.demopanel.view.setGradientShader
 import com.pop.viewlib.R
 import kotlin.math.abs
-import kotlin.math.acos
 import kotlin.math.max
 import kotlin.math.min
 
@@ -97,6 +96,8 @@ class PopSeekBar : View {
      */
     var maxStretchDistance = 50
 
+    var overStretchEnable = true
+
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
         initView(attrs)
     }
@@ -145,6 +146,8 @@ class PopSeekBar : View {
         naturalProcess = typeArray.getBoolean(R.styleable.PopSeekBar_naturalProcess, false)
 
         isHorizontal = typeArray.getInt(R.styleable.PopSeekBar_orientation, 0) == 0
+
+        overStretchEnable = typeArray.getBoolean(R.styleable.PopSeekBar_overStretchEnable, true)
 
         trackPath = Path()
         trackPaint = Paint().apply {
@@ -259,14 +262,6 @@ class PopSeekBar : View {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
-
-        val action = when(event.action){
-            MotionEvent.ACTION_DOWN -> "ACTION_DOWN"
-            MotionEvent.ACTION_MOVE -> "ACTION_MOVE"
-            MotionEvent.ACTION_UP -> "ACTION_UP"
-            else -> "UNKNOWN"
-        }
-//        Log.e(TAG, "onTouchEvent: action= $action x= ${event.x}")
         if (!this.isEnabled) return false
         if (isHorizontal) {
             val x = event.x
@@ -285,18 +280,20 @@ class PopSeekBar : View {
                 MotionEvent.ACTION_MOVE -> {
                     val progressDiffValue = ((event.x - touchDownPoint.x) / width * max).toInt()
                     val progressValue = touchDownProgress + progressDiffValue
-                    Log.e(TAG, "onTouchEvent: layoutParams.width= ${layoutParams.width} progressDiffValue= $progressDiffValue progressValue= $progressValue",)
 
-                    if (progressValue > max || progressValue < 0) {
-                        val widthAddition = min(maxStretchDistance, ((if (progressValue > max) progressValue - max else abs(progressValue)) / max.toFloat() * stretchStep).toInt())
+                    if (overStretchEnable){
+                        if (progressValue > max || progressValue < 0) {
+                            val widthAddition = min(maxStretchDistance, ((if (progressValue > max) progressValue - max else abs(progressValue)) / max.toFloat() * stretchStep).toInt())
 
-                        if (widthAddition > maxStretchDistance) return true
-                        layoutParams.width = widthAddition + originWidth
-                        layoutParams.height =
-                            ((originWidth * originHeight) / (widthAddition + originWidth))
-                        requestLayout()
+                            if (widthAddition > maxStretchDistance) return true
+                            layoutParams.width = widthAddition + originWidth
+                            layoutParams.height =
+                                ((originWidth * originHeight) / (widthAddition + originWidth))
+                            requestLayout()
 
+                        }
                     }
+
                     setProgress(max(min(max, progressValue), 0), true)
                 }
 
@@ -335,13 +332,16 @@ class PopSeekBar : View {
                     val progressDiffValue = ((touchDownPoint.y - event.y ) / height * max).toInt()
                     val progressValue = touchDownProgress + progressDiffValue
 
-                    if (progressValue > max || progressValue < 0) {
-                        val heightAddition = min(maxStretchDistance,  ((if (progressValue > max) progressValue - max else abs(progressValue)) / max.toFloat() * stretchStep).toInt())
+                    if (overStretchEnable){
+                        if (progressValue > max || progressValue < 0) {
+                            val heightAddition = min(maxStretchDistance,  ((if (progressValue > max) progressValue - max else abs(progressValue)) / max.toFloat() * stretchStep).toInt())
 
-                        layoutParams.height = heightAddition + originHeight
-                        layoutParams.width = ((originWidth * originHeight) / (heightAddition + originHeight))
-                        requestLayout()
+                            layoutParams.height = heightAddition + originHeight
+                            layoutParams.width = ((originWidth * originHeight) / (heightAddition + originHeight))
+                            requestLayout()
+                        }
                     }
+
                     setProgress(max(min(max, progressValue), 0), true)
                 }
 
