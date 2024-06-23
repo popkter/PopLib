@@ -17,8 +17,8 @@ import android.view.WindowManager
 import android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND
 import android.view.animation.LinearInterpolator
 import com.pop.popview.databinding.NotificationPanelBinding
-import com.pop.viewlib.not
-import com.pop.viewlib.yes
+import com.pop.viewlib.pulldown.not
+import com.pop.viewlib.pulldown.yes
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.abs
 import kotlin.math.max
@@ -61,7 +61,10 @@ class NotificationDialog(context: Context) : Dialog(context) {
                             or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                             or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                             or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-                            or WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
+                            or WindowManager.LayoutParams.FLAG_BLUR_BEHIND
+                            or WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS
+                            )
+                    layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
                     width = MATCH_PARENT
                     height = MATCH_PARENT
                     dimAmount = 0F
@@ -72,6 +75,9 @@ class NotificationDialog(context: Context) : Dialog(context) {
                 }
                 clearFlags(FLAG_DIM_BEHIND)
 //                setBackgroundBlurRadius(0)
+/*                decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION*/
+
             }
             show()
             isInit = false
