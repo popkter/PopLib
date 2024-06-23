@@ -20,13 +20,13 @@ import kotlin.math.min
 private val viewTimerJobMap = WeakHashMap<View, Job?>()
 
 // 使用扩展属性为 View 添加 timerJob 属性
-var View.timerJob: Job?
+internal var View.timerJob: Job?
     get() = viewTimerJobMap[this]
     set(value) {
         viewTimerJobMap[this] = value
     }
 
-fun View.dismiss() {
+internal fun View.dismiss() {
     stopTimer()
     doOnDismissStart?.invoke()
     setOnTouchListener(null)
@@ -55,7 +55,7 @@ fun View.dismiss() {
     }.start()
 }
 
-fun View.resetDismissTimer() {
+internal fun View.resetDismissTimer() {
     this.timerJob?.cancel()
     this.timerJob = CoroutineScope(Dispatchers.Main).launch {
         delay(dismissDuration)
@@ -63,17 +63,17 @@ fun View.resetDismissTimer() {
     }
 }
 
-fun View.stopTimer() {
+internal fun View.stopTimer() {
     this.timerJob?.cancel()
     this.timerJob = null
 }
 
-val View.windowManager: WindowManager?
+internal val View.windowManager: WindowManager?
     get() {
         return context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
     }
 
-var View.doOnDismissStart: (() -> Unit)?
+internal var View.doOnDismissStart: (() -> Unit)?
     get() {
         val lambdaWrapper = getTag(R.string.doOnAnimatorStart) as? LambdaWrapper
         return lambdaWrapper?.lambda
@@ -82,7 +82,7 @@ var View.doOnDismissStart: (() -> Unit)?
         setTag(R.string.doOnAnimatorStart, value?.let { LambdaWrapper(it) })
     }
 
-var View.doOnDismissEnd: (() -> Unit)?
+internal var View.doOnDismissEnd: (() -> Unit)?
     get() {
         val lambdaWrapper = getTag(R.string.doOnDismissEnd) as? LambdaWrapper
         return lambdaWrapper?.lambda
@@ -91,25 +91,25 @@ var View.doOnDismissEnd: (() -> Unit)?
         setTag(R.string.doOnDismissEnd, value?.let { LambdaWrapper(it) })
     }
 
-var View.hideCoordinateY: Int
+internal var View.hideCoordinateY: Int
     get() = getTag(R.string.hideCoordinateY) as? Int ?: 0
     set(value) {
         setTag(R.string.hideCoordinateY, value)
     }
-var View.showCoordinateY: Int
+internal var View.showCoordinateY: Int
     get() = getTag(R.string.showCoordinateY) as? Int ?: 0
     set(value) {
         setTag(R.string.showCoordinateY, value)
     }
 
-var View.startAnimatorInterpolator: Interpolator
+internal var View.startAnimatorInterpolator: Interpolator
     get() =
         getTag(R.string.startAnimatorInterpolator) as? Interpolator ?: OvershootInterpolator(0.5F)
     set(value) {
         setTag(R.string.startAnimatorInterpolator, value)
     }
 
-var View.dismissAnimatorInterpolator: Interpolator
+internal var View.dismissAnimatorInterpolator: Interpolator
     get() =
         getTag(R.string.dismissAnimatorInterpolator) as? Interpolator
             ?: AnticipateOvershootInterpolator(1F)
@@ -117,12 +117,12 @@ var View.dismissAnimatorInterpolator: Interpolator
         setTag(R.string.dismissAnimatorInterpolator, value)
     }
 
-var View.dismissDuration: Long
+internal var View.dismissDuration: Long
     get() = getTag(R.string.dismissDuration) as? Long ?: 2000
     set(value) = setTag(R.string.dismissDuration, value)
 
 
-var View.windowLayoutParams: WindowManager.LayoutParams?
+internal var View.windowLayoutParams: WindowManager.LayoutParams?
     get() = getTag(R.string.windowLayoutParams) as? WindowManager.LayoutParams
     set(value) = setTag(R.string.windowLayoutParams, value)
 

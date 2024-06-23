@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/test_image"
     tools:context=".Main2Activity">
 
     <com.pop.viewlib.seekbar.PopSeekBar
@@ -12,70 +13,123 @@
         android:layout_width="500dp"
         android:layout_height="100dp"
         android:layout_marginTop="20dp"
-        app:progressSolidColor="@color/black"
-        app:trackSolidColor="#FF5722"
-        app:commonRadius="20dp"
         android:paddingStart="30dp"
-        app:overStretchEnable="false"
+        app:commonRadius="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:overStretchEnable="false"
+        app:progressSolidColor="@color/black"
+        app:trackSolidColor="#FF5722" />
 
     <TextView
         android:id="@+id/progressTv1"
         android:layout_width="50dp"
-        android:text="0"
         android:layout_height="50dp"
         android:gravity="center"
-        android:textSize="20sp"
+        android:text="0"
         android:textColor="@color/white"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="@id/seekbar1"
         app:layout_constraintEnd_toEndOf="@id/seekbar1"
         app:layout_constraintTop_toTopOf="@id/seekbar1" />
 
-
-    <com.pop.viewlib.seekbar.PopSeekBar
-        android:id="@+id/seekbar"
-        android:paddingStart="10dp"
-        android:paddingTop="60dp"
-        android:paddingBottom="30dp"
-        android:layout_width="100dp"
-        android:layout_height="300dp"
-        android:layout_marginTop="10dp"
-        app:progressStartSolidColor="#FF5722"
-        app:progressEndSolidColor="@android:color/transparent"
-        app:progressGradientAngle="270"
-        app:progressSolidColor="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:trackSolidColor="#CCFFFFFF"
-        app:trackRadius="20dp"
-        app:orientation="vertical"
-        app:naturalProcess="true"
+    <Button
+        android:id="@+id/pull"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toBottomOf="@id/seekbar1"
+        android:text="pull down"/>
 
-    <ImageView
-        android:id="@+id/muteIv"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/icon_navigation_media_selector"
-        app:layout_constraintBottom_toBottomOf="@id/seekbar"
-        app:layout_constraintStart_toStartOf="@id/seekbar"
-        app:layout_constraintEnd_toEndOf="@id/seekbar"/>
+    <Button
+        android:id="@+id/pick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pull"
+        android:text="pick up"/>
 
-    <TextView
-        android:id="@+id/progressTv"
-        android:layout_width="50dp"
-        android:text="0"
-        android:layout_height="50dp"
-        android:gravity="center"
-        android:textSize="20sp"
-        android:textColor="@color/white"
-        app:layout_constraintTop_toTopOf="@id/seekbar"
-        app:layout_constraintStart_toStartOf="@id/seekbar"
-        app:layout_constraintEnd_toEndOf="@id/seekbar" />
+<!--    <com.pop.viewlib.PopPullDownLayout
+        android:id="@+id/pullDownLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:hide="true">
+
+&lt;!&ndash;        <View
+            android:id="@+id/bgView"
+            android:background="@android:color/transparent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>&ndash;&gt;
+
+        <com.pop.viewlib.seekbar.PopSeekBar
+            android:id="@+id/volumeBar"
+            android:layout_width="100dp"
+            android:layout_height="300dp"
+            android:layout_marginStart="300dp"
+            android:layout_marginBottom="500dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/guideline40"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:naturalProcess="true"
+            app:orientation="vertical"
+            app:progressEndSolidColor="@android:color/transparent"
+            app:progressGradientAngle="270"
+            app:progressSolidColor="@color/black"
+            app:progressStartSolidColor="#FF5722"
+            app:trackRadius="20dp"
+            app:trackSolidColor="#CCFFFFFF" />
+
+        <ImageView
+            android:id="@+id/volumeIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="20dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/arrow_up"
+            app:layout_constraintBottom_toBottomOf="@id/volumeBar"
+            app:layout_constraintEnd_toEndOf="@id/volumeBar"
+            app:layout_constraintStart_toStartOf="@id/volumeBar" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline40"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.4" />
+
+        <com.pop.viewlib.seekbar.PopSeekBar
+            android:id="@+id/brightnessBar"
+            android:layout_width="100dp"
+            android:layout_height="300dp"
+            android:layout_marginStart="600dp"
+            android:layout_marginBottom="500dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/guideline40"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:naturalProcess="true"
+            app:orientation="vertical"
+            app:progressEndSolidColor="@android:color/transparent"
+            app:progressGradientAngle="270"
+            app:progressSolidColor="@color/black"
+            app:progressStartSolidColor="#FF5722"
+            app:trackRadius="20dp"
+            app:trackSolidColor="#CCFFFFFF" />
+
+        <ImageView
+            android:id="@+id/brightnessIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="20dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/arrow_up"
+            app:layout_constraintBottom_toBottomOf="@id/brightnessBar"
+            app:layout_constraintEnd_toEndOf="@id/brightnessBar"
+            app:layout_constraintStart_toStartOf="@id/brightnessBar" />
+
+    </com.pop.viewlib.PopPullDownLayout>-->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

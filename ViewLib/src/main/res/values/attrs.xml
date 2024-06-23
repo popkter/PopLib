@@ -67,4 +67,9 @@
             <enum name="rightBottom2leftTop" value="315" />
         </attr>
     </declare-styleable>
+
+    <declare-styleable name="PopPullDownLayout">
+        <attr name="hide" format="boolean"/>
+        <attr name="blurImage" format="reference"/>
+    </declare-styleable>
 </resources>

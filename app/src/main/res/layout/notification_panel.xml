@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/pullDownLayout"
+    android:fitsSystemWindows="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.pop.viewlib.seekbar.PopSeekBar
+        android:id="@+id/volumeBar"
+        android:layout_width="100dp"
+        android:layout_height="300dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline40"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:naturalProcess="true"
+        app:orientation="vertical"
+        app:progressEndSolidColor="@android:color/transparent"
+        app:progressGradientAngle="270"
+        app:progressSolidColor="@color/black"
+        app:progressStartSolidColor="#FF5722"
+        app:trackRadius="20dp"
+        app:trackSolidColor="#CCFFFFFF" />
+
+    <ImageView
+        android:id="@+id/volumeIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="20dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/arrow_up"
+        app:layout_constraintBottom_toBottomOf="@id/volumeBar"
+        app:layout_constraintEnd_toEndOf="@id/volumeBar"
+        app:layout_constraintStart_toStartOf="@id/volumeBar" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline40"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.4" />
+
+    <com.pop.viewlib.seekbar.PopSeekBar
+        android:id="@+id/brightnessBar"
+        android:layout_width="100dp"
+        android:layout_height="300dp"
+        android:layout_marginStart="300dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline40"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:naturalProcess="true"
+        app:orientation="vertical"
+        app:progressEndSolidColor="@android:color/transparent"
+        app:progressGradientAngle="270"
+        app:progressSolidColor="@color/black"
+        app:progressStartSolidColor="#FF5722"
+        app:trackRadius="20dp"
+        app:trackSolidColor="#CCFFFFFF" />
+
+    <ImageView
+        android:id="@+id/brightnessIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="20dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/arrow_up"
+        app:layout_constraintBottom_toBottomOf="@id/brightnessBar"
+        app:layout_constraintEnd_toEndOf="@id/brightnessBar"
+        app:layout_constraintStart_toStartOf="@id/brightnessBar" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
