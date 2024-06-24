@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.PaintFlagsDrawFilter
 import android.graphics.Path
 import android.graphics.PointF
 import android.util.AttributeSet
@@ -152,6 +153,7 @@ class PopSeekBar : View {
         trackPath = Path()
         trackPaint = Paint().apply {
             style = Paint.Style.FILL
+            isAntiAlias = true
             if (trackSolidColor != 0){
                 color = trackSolidColor
             }
@@ -160,6 +162,7 @@ class PopSeekBar : View {
         progressPath = Path()
         progressPaint = Paint().apply {
             style = Paint.Style.FILL
+            isAntiAlias = true
             if (progressSolidColor != 0){color = progressSolidColor
             }
         }
@@ -198,6 +201,7 @@ class PopSeekBar : View {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+//        canvas.drawFilter = PaintFlagsDrawFilter(0,Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
         canvas.drawPath(trackPath, trackPaint)
 
         if (isHorizontal) {
