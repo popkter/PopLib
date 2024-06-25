@@ -6,15 +6,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.PaintFlagsDrawFilter
 import android.graphics.Path
 import android.graphics.PointF
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.OvershootInterpolator
+import androidx.core.animation.doOnEnd
 import com.pop.demopanel.view.drawHorizontalProgressPath
 import com.pop.demopanel.view.drawHorizontalProgressPathNatural
 import com.pop.demopanel.view.drawTrackPath
@@ -26,7 +25,6 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-
 class PopSeekBar : View {
 
     // TODO: properties to abstract class
@@ -35,9 +33,7 @@ class PopSeekBar : View {
         const val TAG = "PopSeekBar"
     }
 
-    private var progress = 0
-    private var finalValue = 0
-
+    private var mProgress: Int = 0
     private lateinit var trackPaint: Paint
     private lateinit var trackColors: IntArray
     private lateinit var trackPath: Path
@@ -66,26 +62,18 @@ class PopSeekBar : View {
 
     private var touchDownProgress = 0
 
+    private var mSeekbarChangeListener: OnPopSeekBarChangeListener? = null
+
     /**
      * whether use natural process modifier
      */
     var naturalProcess = true
 
     /**
-     * progress change listener
-     */
-    var onProgressChangeListener: ((progress: Int, isFinal: Boolean) -> Unit)? = null
-
-    /**
      * whether can response touch down event
      * not suggest to modify it
      */
     var canResponseTouch = false
-
-    /**
-     * max value of progress
-     */
-    var max = 100
 
     /**
      * deformation dimension per unit stretch of the view
@@ -98,6 +86,12 @@ class PopSeekBar : View {
     var maxStretchDistance = 50
 
     var overStretchEnable = true
+
+    var onUserInput = false
+
+    var max: Int = 100
+
+    var min: Int = 0
 
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
         initView(attrs)
@@ -163,19 +157,12 @@ class PopSeekBar : View {
         progressPaint = Paint().apply {
             style = Paint.Style.FILL
             isAntiAlias = true
-            if (progressSolidColor != 0){color = progressSolidColor
+            if (progressSolidColor != 0) {
+                color = progressSolidColor
             }
         }
-
         finalPath = Path()
         typeArray.recycle()
-    }
-
-    private fun notifyFinalProgress() {
-        if (finalValue != progress) {
-            finalValue = progress
-            onProgressChangeListener?.invoke(progress, true)
-        }
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -185,7 +172,13 @@ class PopSeekBar : View {
             originWidth = width
             originHeight = height
         }
-        trackPath.drawTrackPath(0F, 0F, width.toFloat(), height.toFloat(), if (trackRadius == 0F) commonRadius else trackRadius)
+        trackPath.drawTrackPath(
+            0F,
+            0F,
+            width.toFloat(),
+            height.toFloat(),
+            if (trackRadius == 0F) commonRadius else trackRadius
+        )
         if (trackColors.any { it != 0 }) {
             trackPaint.setGradientShader(
                 0F,
@@ -200,12 +193,11 @@ class PopSeekBar : View {
     }
 
     override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-//        canvas.drawFilter = PaintFlagsDrawFilter(0,Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+//        super.onDraw(canvas)
         canvas.drawPath(trackPath, trackPaint)
 
         if (isHorizontal) {
-            val progressWidth = width * (progress.toFloat() / max)
+            val progressWidth = width * (mProgress.toFloat() / max)
             if (naturalProcess) {
                 progressPath.drawHorizontalProgressPathNatural(
                     0F,
@@ -226,7 +218,7 @@ class PopSeekBar : View {
                 )
             }
         } else {
-            val progressHeight = height * (progress.toFloat() / max)
+            val progressHeight = height * (mProgress.toFloat() / max)
             if (naturalProcess) {
                 progressPath.drawVerticalProgressPathNatural(
                     0F,
@@ -267,140 +259,132 @@ class PopSeekBar : View {
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (!this.isEnabled) return false
-        if (isHorizontal) {
-            val x = event.x
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    touchDownProgress = if (canResponseTouch) {
-                        val progressValue = ((x / width) * max).toInt()
-                        setProgress(progressValue, notifyListener = false, animator = true)
-                        progressValue
-                    }else{
-                        progress
-                    }
-                    touchDownPoint.set(event.x, event.y)
-                }
-
-                MotionEvent.ACTION_MOVE -> {
-                    val progressDiffValue = ((event.x - touchDownPoint.x) / width * max).toInt()
-                    val progressValue = touchDownProgress + progressDiffValue
-
-                    if (overStretchEnable){
-                        if (progressValue > max || progressValue < 0) {
-                            val widthAddition = min(maxStretchDistance, ((if (progressValue > max) progressValue - max else abs(progressValue)) / max.toFloat() * stretchStep).toInt())
-
-                            if (widthAddition > maxStretchDistance) return true
-                            layoutParams.width = widthAddition + originWidth
-                            layoutParams.height =
-                                ((originWidth * originHeight) / (widthAddition + originWidth))
-                            requestLayout()
-
-                        }
-                    }
-
-                    setProgress(max(min(max, progressValue), 0), true)
-                }
-
-                MotionEvent.ACTION_UP -> {
-                    if (layoutParams.width >= originWidth) {
-                        val widthHolder = PropertyValuesHolder.ofInt("width", width, originWidth)
-                        val heightHolder =
-                            PropertyValuesHolder.ofInt("height", height, originHeight)
-                        ValueAnimator.ofPropertyValuesHolder(widthHolder, heightHolder).apply {
-                            interpolator = OvershootInterpolator()
-                            addUpdateListener {
-                                layoutParams.width = it.getAnimatedValue("width") as Int
-                                layoutParams.height = it.getAnimatedValue("height") as Int
-                                requestLayout()
-                            }
-                        }.start()
-                    }
-                    notifyFinalProgress()
-                }
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                onUserInput = true
+                onStartTrackingTouch(event)
             }
-        } else {
-            val y = event.y
-            when(event.action){
-                MotionEvent.ACTION_DOWN -> {
-                    touchDownProgress = if (canResponseTouch) {
-                        val progressValue = ((1 - y / height) * max).toInt()
-                        setProgress(progressValue, notifyListener = false, animator = true)
-                        progressValue
-                    }else{
-                        progress
-                    }
-                    touchDownPoint.set(event.x, event.y)
-                }
 
-                MotionEvent.ACTION_MOVE -> {
-                    val progressDiffValue = ((touchDownPoint.y - event.y ) / height * max).toInt()
-                    val progressValue = touchDownProgress + progressDiffValue
+            MotionEvent.ACTION_MOVE -> {
+                onMoveTrackingTouch(event)
+            }
 
-                    if (overStretchEnable){
-                        if (progressValue > max || progressValue < 0) {
-                            val heightAddition = min(maxStretchDistance,  ((if (progressValue > max) progressValue - max else abs(progressValue)) / max.toFloat() * stretchStep).toInt())
-
-                            layoutParams.height = heightAddition + originHeight
-                            layoutParams.width = ((originWidth * originHeight) / (heightAddition + originHeight))
-                            requestLayout()
-                        }
-                    }
-
-                    setProgress(max(min(max, progressValue), 0), true)
-                }
-
-                MotionEvent.ACTION_UP -> {
-                    if (layoutParams.height >= originHeight) {
-                        val widthHolder = PropertyValuesHolder.ofInt("width", width, originWidth)
-                        val heightHolder = PropertyValuesHolder.ofInt("height", height, originHeight)
-                        ValueAnimator.ofPropertyValuesHolder(widthHolder, heightHolder).apply {
-                            interpolator = OvershootInterpolator()
-                            addUpdateListener {
-                                layoutParams.width = it.getAnimatedValue("width") as Int
-                                layoutParams.height = it.getAnimatedValue("height") as Int
-                                requestLayout()
-                            }
-                        }.start()
-                    }
-                    notifyFinalProgress()
-                }
+            MotionEvent.ACTION_UP,
+            MotionEvent.ACTION_CANCEL -> {
+                onUserInput = false
+                onStopTrackingTouch(event)
             }
         }
         invalidate()
         return true
     }
 
-    /**
-     * update Progress value
-     * [notifyListener] whether notify listener
-     * [animator] whether use animator
-     */
-    fun setProgress(progress: Int, notifyListener: Boolean, animator: Boolean = false) {
-        val aimProgress = max(0, min(max, progress))
-        val curProgress = this.progress
-        if (aimProgress != curProgress) {
-            if (animator) {
-                ValueAnimator.ofInt(curProgress, aimProgress).apply {
-                    interpolator = AccelerateDecelerateInterpolator()
-                    addUpdateListener { animation ->
-                        (animation.animatedValue as Int).let {
-                            this@PopSeekBar.progress = it
-                            if (notifyListener) {
-                                onProgressChangeListener?.invoke(it, false)
-                            }
-                        }
-                        invalidate()
-                    }
-                    duration = abs(aimProgress - curProgress) * 5L
-                }.start()
+    private fun onStartTrackingTouch(event: MotionEvent) {
+        mSeekbarChangeListener?.onStartTrackingTouch(this, mProgress)
+        touchDownPoint.set(event.rawX, event.rawY)
+        touchDownProgress = if (isHorizontal) {
+            if (canResponseTouch) {
+                val progressValue = ((x / width) * max).toInt()
+                setProgressInternal(progressValue, true)
+                progressValue
             } else {
-                this.progress = aimProgress
-                invalidate()
-                if (notifyListener) {
-                    onProgressChangeListener?.invoke(this.progress, false)
-                }
+                mProgress
+            }
+        } else {
+            if (canResponseTouch) {
+                val progressValue = ((1 - y / height) * max).toInt()
+                progressValue
+            } else {
+                mProgress
             }
         }
     }
-    
+
+    private fun onMoveTrackingTouch(event: MotionEvent): Boolean {
+        val progressValue = touchDownProgress + if (isHorizontal) {
+            ((event.rawX - touchDownPoint.x) / width * max).toInt()
+        } else {
+            ((touchDownPoint.y - event.rawY) / height * max).toInt()
+        }
+
+        if (progressValue !in min..max) {
+            if (overStretchEnable) {
+                val addition = min(maxStretchDistance, ((if (progressValue > max) progressValue - max else abs(progressValue)) / max.toFloat() * stretchStep).toInt())
+                if (addition <= maxStretchDistance) {
+                    if (isHorizontal) { layoutParams.width = addition + originWidth
+                        layoutParams.height = ((originWidth * originHeight) / (addition + originWidth))
+                    } else {
+                        layoutParams.height = addition + originHeight
+                        layoutParams.width = ((originWidth * originHeight) / (addition + originHeight))
+                    }
+                    requestLayout()
+                }
+            }
+        }
+        setProgressInternal(progressValue, true)
+
+        return true
+    }
+
+    private fun onStopTrackingTouch(event: MotionEvent) {
+        if (layoutParams.width >= originWidth || layoutParams.height >= originHeight) {
+            val widthHolder = PropertyValuesHolder.ofInt("width", width, originWidth)
+            val heightHolder =
+                PropertyValuesHolder.ofInt("height", height, originHeight)
+            ValueAnimator.ofPropertyValuesHolder(widthHolder, heightHolder).apply {
+                interpolator = OvershootInterpolator()
+                addUpdateListener {
+                    layoutParams.width = it.getAnimatedValue("width") as Int
+                    layoutParams.height = it.getAnimatedValue("height") as Int
+                    requestLayout()
+                }
+                doOnEnd {
+                    mSeekbarChangeListener?.onStopTrackingTouch(this@PopSeekBar, mProgress)
+                }
+            }.start()
+        }
+    }
+
+    /**
+     * update Progress value
+     * [animator] whether use animator
+     */
+    fun setProgress(progress: Int, animate: Boolean = false) {
+        setProgressInternal(progress, false, animate)
+    }
+
+    fun getProgress(): Int = mProgress
+
+    private fun setProgressInternal(progress: Int, fromUser: Boolean, animate: Boolean = false) {
+        val temp = max(min(max, progress), min)
+        if (mProgress != temp) {
+            if (animate) {
+                ValueAnimator.ofInt(mProgress, temp).apply {
+                    interpolator = AccelerateDecelerateInterpolator()
+                    addUpdateListener { animation ->
+                        mProgress = animation.animatedValue as Int
+                        mSeekbarChangeListener?.onProgressChanged(this@PopSeekBar, mProgress,fromUser)
+                        invalidate()
+                    }
+                    duration = abs(mProgress - temp) * 5L
+                }.start()
+            } else {
+                mProgress = temp
+                mSeekbarChangeListener?.onProgressChanged(this@PopSeekBar, mProgress,fromUser)
+                invalidate()
+            }
+        }
+    }
+
+    fun setOnSeekBarChangeListener(listener: OnPopSeekBarChangeListener?) {
+        mSeekbarChangeListener = listener
+    }
+
+
+    interface OnPopSeekBarChangeListener {
+        fun onStartTrackingTouch(seekBar: PopSeekBar, mProgress: Int)
+        fun onStopTrackingTouch(seekBar: PopSeekBar, mProgress: Int)
+        fun onProgressChanged(seekBar: PopSeekBar, mProgress: Int, fromUser: Boolean)
+    }
 }
+
