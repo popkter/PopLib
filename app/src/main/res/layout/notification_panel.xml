@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/pullDownLayout"
-    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <com.pop.viewlib.seekbar.PopSeekBar
         android:id="@+id/volumeBar"
@@ -70,5 +70,19 @@
         app:layout_constraintBottom_toBottomOf="@id/brightnessBar"
         app:layout_constraintEnd_toEndOf="@id/brightnessBar"
         app:layout_constraintStart_toStartOf="@id/brightnessBar" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guideline40"
+        app:layout_constraintTop_toTopOf="parent"
+        app:spanCount="6"
+        tools:itemCount="100"
+        tools:listitem="@layout/item" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
