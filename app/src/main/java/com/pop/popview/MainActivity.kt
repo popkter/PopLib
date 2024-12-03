@@ -16,12 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.viewbinding.ViewBinding
 import com.pop.popview.databinding.PopNotification2Binding
 import com.pop.popview.databinding.PopNotification3Binding
 import com.pop.popview.databinding.PopNotificationBinding
 import com.pop.popview.ui.theme.PopViewTheme
-import com.pop.toolslib.ViewTools
 import com.pop.viewlib.dynamic_dialog.QuickFloatViewManager
 import com.pop.viewlib.dynamic_dialog.SpiritViewManager
 import java.util.UUID
